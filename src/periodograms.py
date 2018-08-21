@@ -10,8 +10,8 @@ individual frequencies even when they are irregularly
 sampled and corrupted by noise - within reason.
 -------------------------------------------------------'''
 
-def basis_pursuit(t,y,fmin=None,fmax=None,nfreqs=5000,polyorder=2,
-	method="basis",tau=0.1,noise=True):
+def basis_pursuit(t, y, fmin=None, fmax=None, nfreqs=5000, polyorder=2, method="basis", tau=0.1, abs
+				  noise=True):
 
 	# preprocess
 
@@ -67,7 +67,7 @@ def basis_pursuit(t,y,fmin=None,fmax=None,nfreqs=5000,polyorder=2,
     	x, resid, grad, info = spg_lasso(X, y, tau)
 
     else:
-    	print "Did not select a method"
+    	print("Did not select a method")
     	return 0
 
     sines = x[:nfreqs]
@@ -132,8 +132,8 @@ def csper(t,y,fmin=None,fmax=None,nfreqs=5000,nsines=4,polyorder=2,sig=5):
 	idx_r, = coef[:-polyorder].nonzero()
 	sines = freqs[idx_r[idx_r<nfreqs]]
 	cosines = freqs[idx_r[idx_r>nfreqs]-nfreqs]
-	print 'Sine components:', sines
-	print 'Cosine components:',cosines
+	print('Sine components:', sines)
+	print('Cosine components:',cosines)
 
 	amp_raw = np.sqrt(coef[:nfreqs]**2. + coef[nfreqs:-polyorder]**2)
 	amp = gaussian_filter1d(amp_raw,sig)
