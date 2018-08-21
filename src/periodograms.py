@@ -10,90 +10,90 @@ individual frequencies even when they are irregularly
 sampled and corrupted by noise - within reason.
 -------------------------------------------------------'''
 
-def basis_pursuit(t, y, fmin=None, fmax=None, nfreqs=5000, polyorder=2, method="basis", tau=0.1, abs
+def basis_pursuit(t, y, fmin=None, fmax=None, nfreqs=5000, polyorder=2, method="basis", tau=0.1,
 				  noise=True):
 
 	# preprocess
 
-    ndata = np.size(y)
+	ndata = np.size(y)
 
-    tmin = t.min()
-    t -= tmin
+	tmin = t.min()
+	t -= tmin
 
-    yscale = y.max()-y.min()
-    ymin = y.min()
+	yscale = y.max()-y.min()
+	ymin = y.min()
 
-    y = (y-ymin)/(yscale)-0.5
+	y = (y-ymin)/(yscale)-0.5
 
-    trange = np.nanmax(t)-np.nanmin(t)
-    dt = np.abs(np.nanmedian(t-np.roll(t,-1)))
-    nt = np.size(t)
+	trange = np.nanmax(t)-np.nanmin(t)
+	dt = np.abs(np.nanmedian(t-np.roll(t,-1)))
+	nt = np.size(t)
 
-    if fmin is None:
-        fmin = 1./trange
-    if fmax is None:
-        fmax = 2./dt
+	if fmin is None:
+		fmin = 1./trange
+	if fmax is None:
+		fmax = 2./dt
 
-    freqs = np.linspace(fmin,fmax,nfreqs)
-    df = np.abs(np.nanmedian(freqs-np.roll(freqs,-1)))
+	freqs = np.linspace(fmin,fmax,nfreqs)
+	df = np.abs(np.nanmedian(freqs-np.roll(freqs,-1)))
 
-    if noise is True:
-    	ndirac = ndata
-    else:
-    	ndirac = 0
+	if noise is True:
+		ndirac = ndata
+	else:
+		ndirac = 0
 
-    X = np.zeros((nt,nfreqs*2+polyorder+1+ndirac))
+	X = np.zeros((nt,nfreqs*2+polyorder+1+ndirac))
 
-    # set up matrix of sines and cosines
-    for j in range(nfreqs):
-        X[:,j] = np.sin(t*freqs[j])
-        X[:,nfreqs+j] = np.cos(t*freqs[j])
+	# set up matrix of sines and cosines
+	for j in range(nfreqs):
+		X[:,j] = np.sin(t*freqs[j])
+		X[:,nfreqs+j] = np.cos(t*freqs[j])
 
-    # now do polynomial bits
-    for j in range(polyorder+1):
-    	pp = t**(polyorder-j)
-        X[:,nfreqs*2 +j] = pp/np.abs(pp.max())
+	# now do polynomial bits
+	for j in range(polyorder+1):
+		pp = t**(polyorder-j)
+		X[:,nfreqs*2 +j] = pp/np.abs(pp.max())
 
-    # now do the dirac delta functions
+	# now do the dirac delta functions
 
-    for j in range(ndirac):
-        X[j,-ndirac+j] = 1.
+	for j in range(ndirac):
+		X[j,-ndirac+j] = 1.
 
-    if method == "basis":
-    	x,resid,grad,info = spg_bp(X, y)
+	if method == "basis":
+		x,resid,grad,info = spg_bp(X, y)
 
-    elif method == "lasso":
-    	tau = 0.1
-    	x, resid, grad, info = spg_lasso(X, y, tau)
+	elif method == "lasso":
+		tau = 0.1
+		x, resid, grad, info = spg_lasso(X, y, tau)
 
-    else:
-    	print("Did not select a method")
-    	return 0
+	else:
+		print("Did not select a method")
+		return 0
 
-    sines = x[:nfreqs]
-    cosines = x[nfreqs:2*nfreqs]
-    power = (sines**2 + cosines**2)
+	sines = x[:nfreqs]
+	cosines = x[nfreqs:2*nfreqs]
+	power = (sines**2 + cosines**2)
 
-    if noise:
-      diracs = x[-ndirac:]
-    else:
-      diracs = None
+	if noise:
+  		diracs = x[-ndirac:]
+	else:
+  		diracs = None
 
-    output = {'freqs':freqs,
-              'sines': sines,
-              'cosines': cosines,
-              'power':power,
-              'polys':x[2*nfreqs:2*nfreqs+polyorder+1],
-              'diracs':diracs,
-              'resid':resid,
-              'grad':grad,
-              'info':info,
-              'coeffs':x,
-              'matrix':X,
-              'model':(np.dot(X,x)+0.5)*yscale+ymin
-             }
+	output = {'freqs':freqs,
+  			  'sines': sines,
+			  'cosines': cosines,
+			  'power':power,
+			  'polys':x[2*nfreqs:2*nfreqs+polyorder+1],
+			  'diracs':diracs,
+			  'resid':resid,
+			  'grad':grad,
+			  'info':info,
+			  'coeffs':x,
+			  'matrix':X,
+			  'model':(np.dot(X,x)+0.5)*yscale+ymin
+			  }
 
-    return output
+	return output
 
 
 def csper(t,y,fmin=None,fmax=None,nfreqs=5000,nsines=4,polyorder=2,sig=5):
