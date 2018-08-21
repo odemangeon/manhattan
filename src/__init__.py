@@ -1,1 +1,1 @@
-import periodograms
+from . import periodograms
