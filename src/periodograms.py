@@ -6,7 +6,7 @@ from spgl1 import spg_bp, spg_lasso
 '''-------------------------------------------------------
 Code to use compressed sensing to generate better, faster
 periodograms. The L1-norm allows you to sparsely recover
-individual frequencies even when they are irregularly 
+individual frequencies even when they are irregularly
 sampled and corrupted by noise - within reason.
 -------------------------------------------------------'''
 
@@ -68,7 +68,7 @@ def basis_pursuit(t,y,fmin=None,fmax=None,nfreqs=5000,polyorder=2,
 
     else:
     	print "Did not select a method"
-    	return 0 
+    	return 0
 
     sines = x[:nfreqs]
     cosines = x[nfreqs:2*nfreqs]
@@ -92,8 +92,8 @@ def basis_pursuit(t,y,fmin=None,fmax=None,nfreqs=5000,polyorder=2,
               'matrix':X,
               'model':(np.dot(X,x)+0.5)*yscale+ymin
              }
-    
-    return output 
+
+    return output
 
 
 def csper(t,y,fmin=None,fmax=None,nfreqs=5000,nsines=4,polyorder=2,sig=5):
